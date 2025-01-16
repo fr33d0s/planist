@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../data/models/appointment_model.dart';
 import '../../home/controllers/home_controller.dart';
-import '../../home/widgets/add_appointment_dialog.dart';
+import '../../appointment/views/add_appointment_dialog.dart';
 
 class AppointmentDetailPage extends StatelessWidget {
   const AppointmentDetailPage({super.key});
@@ -69,7 +69,7 @@ class AppointmentDetailPage extends StatelessWidget {
                   const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
-                      Get.to(() => AddAppointmentDialog(
+                      Get.to(() => AddAppointmentView(
                             initialAppointment: updatedAppointment,
                           ));
                     },

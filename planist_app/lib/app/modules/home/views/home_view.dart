@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../daily/views/daily_views.dart';
+import '../../daily/views/daily_view.dart';
 import '../../monthly/views/monthly_view.dart';
 import '../../weekly/views/weekly_view.dart';
 import '../controllers/home_controller.dart';
-import '../widgets/add_appointment_dialog.dart';
+import '../../appointment/views/add_appointment_dialog.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -21,10 +21,11 @@ class HomeView extends GetView<HomeController> {
               onPressed: () {},
             ),
           ],
-          title: Image.asset(
-            "assets/logo.png",
-            height: 130,
-            color: Colors.white,
+          title: const Text(
+            "PLANIST",
+            style: TextStyle(
+              color: Colors.white,
+            ),
           ),
           bottom: TabBar(
             labelColor: Colors.white,
@@ -46,7 +47,7 @@ class HomeView extends GetView<HomeController> {
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xFF81C784),
-          onPressed: () => Get.dialog(const AddAppointmentDialog()),
+          onPressed: () => Get.dialog(const AddAppointmentView()),
           child: Icon(
             Icons.add,
             color: Theme.of(context).primaryColor,

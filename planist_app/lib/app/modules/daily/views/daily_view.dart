@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:planist_app/app/modules/daily/controllers/daily_view_controller.dart';
 
 import '../../../data/models/appointment_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../home/controllers/home_controller.dart';
 
-class DailyView extends GetView<HomeController> {
+class DailyView extends GetView<DailyViewController> {
   const DailyView({super.key});
 
   @override
@@ -74,7 +75,7 @@ class DailyView extends GetView<HomeController> {
       itemBuilder: (context, index) {
         return _LuxuryAppointmentCard(
           appointment: dailyAppointments[index],
-          controller: controller,
+          controller: Get.find<HomeController>(),
         );
       },
     );

@@ -1,48 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:planist_app/app/modules/appointment/controllers/add_appointment_view_controller.dart';
-
 import '../../../companents/general_snackbar.dart';
 import '../../../data/models/appointment_model.dart';
 import '../../home/controllers/home_controller.dart';
 
 class AddAppointmentView extends GetView<AddAppointmentViewController> {
-  final AppointmentModel? initialAppointment;
-
-  const AddAppointmentView({super.key, this.initialAppointment});
+  const AddAppointmentView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    initializeDateFormatting('tr_TR', null);
-
-    final titleController = TextEditingController(
-      text: initialAppointment?.title ?? '',
-    );
-    final descriptionController = TextEditingController(
-      text: initialAppointment?.description ?? '',
-    );
-    final selectedDate = (initialAppointment?.dateTime ?? DateTime.now()).obs;
-    final selectedTime = TimeOfDay.fromDateTime(
-      initialAppointment?.dateTime ?? DateTime.now(),
-    ).obs;
-    final selectedColor =
-        (initialAppointment?.color ?? Colors.blueGrey.value).obs;
-
-    final colorOptions = [
-      const Color(0xFFEF9A9A).value,
-      const Color(0xFF81D4FA).value,
-      const Color(0xFF81C784).value,
-      const Color(0xFFFFCC80).value,
-      const Color(0xFFCE93D8).value,
-    ];
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
-          initialAppointment == null ? 'Yeni Randevu' : 'Randevuyu Düzenle',
+          controller.initialAppointment == null
+              ? 'Yeni Randevu'
+              : 'Randevuyu Düzenle',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -64,7 +39,7 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
               _buildSectionTitle('Randevu Bilgileri'),
               const SizedBox(height: 16),
               TextField(
-                controller: titleController,
+                controller: controller.titleController,
                 decoration: _buildInputDecoration(
                   'Randevu başlığını girin',
                   Icons.short_text_rounded,
@@ -72,8 +47,8 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: descriptionController,
-                maxLines: 3,
+                controller: controller.descriptionController,
+                maxLines: 2,
                 decoration: _buildInputDecoration(
                   'Randevu detaylarını girin',
                   Icons.notes_rounded,
@@ -91,7 +66,7 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
                       Icons.calendar_today_rounded,
                       Obx(() => Text(
                             DateFormat('d MMM yyyy', 'tr_TR')
-                                .format(selectedDate.value),
+                                .format(controller.selectedDate.value),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -100,13 +75,13 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
                       () async {
                         final date = await showDatePicker(
                           context: context,
-                          initialDate: selectedDate.value,
+                          initialDate: controller.selectedDate.value,
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(
                             const Duration(days: 365),
                           ),
                         );
-                        if (date != null) selectedDate.value = date;
+                        if (date != null) controller.selectedDate.value = date;
                       },
                     ),
                   ),
@@ -117,7 +92,7 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
                       'Saat',
                       Icons.access_time_rounded,
                       Obx(() => Text(
-                            selectedTime.value.format(context),
+                            controller.selectedTime.value.format(context),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -126,9 +101,9 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
                       () async {
                         final time = await showTimePicker(
                           context: context,
-                          initialTime: selectedTime.value,
+                          initialTime: controller.selectedTime.value,
                         );
-                        if (time != null) selectedTime.value = time;
+                        if (time != null) controller.selectedTime.value = time;
                       },
                     ),
                   ),
@@ -141,13 +116,15 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
                 return Wrap(
                   spacing: 12,
                   children: List.generate(
-                    colorOptions.length,
+                    controller.colorOptions.length,
                     (index) => GestureDetector(
-                      onTap: () => selectedColor.value = colorOptions[index],
+                      onTap: () => controller.selectedColor.value =
+                          controller.colorOptions[index],
                       child: CircleAvatar(
-                        backgroundColor: Color(colorOptions[index]),
+                        backgroundColor: Color(controller.colorOptions[index]),
                         radius: 20,
-                        child: selectedColor.value == colorOptions[index]
+                        child: controller.selectedColor.value ==
+                                controller.colorOptions[index]
                             ? const Icon(Icons.check)
                             : null,
                       ),
@@ -168,7 +145,7 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
         ),
         child: ElevatedButton(
           onPressed: () {
-            if (titleController.text.isEmpty) {
+            if (controller.titleController.text.isEmpty) {
               showGeneralSnackbar(
                 title: 'Uyarı',
                 message: 'Lütfen randevu başlığını girin',
@@ -178,24 +155,24 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
             }
 
             final dateTime = DateTime(
-              selectedDate.value.year,
-              selectedDate.value.month,
-              selectedDate.value.day,
-              selectedTime.value.hour,
-              selectedTime.value.minute,
+              controller.selectedDate.value.year,
+              controller.selectedDate.value.month,
+              controller.selectedDate.value.day,
+              controller.selectedTime.value.hour,
+              controller.selectedTime.value.minute,
             );
 
             final appointment = AppointmentModel(
-              id: initialAppointment?.id ??
+              id: controller.initialAppointment?.id ??
                   DateTime.now().millisecondsSinceEpoch,
-              title: titleController.text,
-              description: descriptionController.text,
+              title: controller.titleController.text,
+              description: controller.descriptionController.text,
               dateTime: dateTime,
-              color: selectedColor.value,
-              type: initialAppointment?.type ?? 'daily',
+              color: controller.selectedColor.value,
+              type: controller.initialAppointment?.type ?? 'daily',
             );
 
-            if (initialAppointment == null) {
+            if (controller.initialAppointment == null) {
               Get.find<HomeController>().addAppointment(appointment);
             } else {
               Get.find<HomeController>().updateAppointment(appointment);
@@ -210,7 +187,7 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
             ),
           ),
           child: Text(
-            initialAppointment == null ? 'Kaydet' : 'Güncelle',
+            controller.initialAppointment == null ? 'Kaydet' : 'Güncelle',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -253,21 +230,16 @@ class AddAppointmentView extends GetView<AddAppointmentViewController> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: Colors.grey.shade800,
-          width: 1,
-        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(
           color: Colors.blueGrey.shade700,
-          width: 1.5,
+          width: 1,
         ),
       ),
       prefixIcon: Icon(
         icon,
-        size: 20,
         color: Colors.grey.shade400,
       ),
       prefixIconColor: Colors.grey.shade400,
